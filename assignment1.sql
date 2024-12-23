@@ -82,3 +82,70 @@ from worker
 select *
 from rankedrecord
 where row_num > (select count(*) from worker) - 5;
+
+--  Q-5. Write an SQL query to print the first three characters of  FIRST_NAME from Worker table.
+select substring(first_name,1,3)
+from worker;
+
+select *,
+	substring(first_name,1,3) as 3_char_name
+from worker;
+
+--  Q-6. Write an SQL query to find the position of the alphabet (‘a’) in the first name column ‘Amitabh’ from Worker table.	
+select position('a' in first_name) as position_of_a
+from worker
+where first_name = 'minakshi';
+
+-- other way
+select locate('a',first_name) as position_of_a
+from worker
+where first_name = 'ajay';
+
+-- other way 
+select locate('a',substring(first_name,2,10))+1 as position_of_a
+from worker            -- where 2=start index, 10=next char after index,+1=char that we left 
+where first_name = 'ajay';
+
+-- bt above code can't be applicable on all names so lets change with variables
+-- 3 (locate index of a and +1 because we want to start the substring index from 3)
+-- 10 (replace it with length of string)
+-- +2 (2 is the position of i so wew can replace with it locate('a',first_name))
+select locate('a',substring(first_name,locate('a',first_name)+1,length(first_name)))+locate('a',first_name) as position
+from worker
+where first_name = 'ajay';
+
+-- other way
+select instr('a',first_name) as position_of_a
+from worker
+where first_name = 'minakshi';
+
+-- Q-7. Write an SQL query to print the highest salary in each department.
+select department, max(salary) as max_Salary
+from worker
+group by department;
+
+-- Q-8. Write an SQL query to print the name of employees having the highest salary in each department.
+select 
+	first_name,
+	last_name,
+	salary,
+	department
+from worker
+where (department,salary) in (
+	select department, max(salary)
+	from worker
+	group by department
+);
+
+--  other way
+select 
+	first_name,
+	last_name,
+	salary,
+	department
+from worker as w1
+where salary=(
+	select max(salary)
+	from worker as w2
+    where w1.department = w2.department
+);
